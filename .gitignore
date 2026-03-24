@@ -1,0 +1,21 @@
+# Environnement Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Données volumineuses — NE PAS pousser sur GitHub
+# (Codes_banques.xlsx est inclus car requis par l'application)
+*.xlsm
+*.xls
+*.csv
+
+# Fichier utilisateurs — confidentiel
+# (Si vous le gérez via st.secrets, décommentez la ligne suivante)
+# users.json
+
+# Fichiers temporaires
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
