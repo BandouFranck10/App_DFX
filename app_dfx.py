@@ -2082,9 +2082,23 @@ def _module_retrocession_inner():
 def _dom_export_code_banque(ws):
     """
     Extrait le code banque d'un fichier DOM EXPORT.
-    Essaie D3, C3, E3, puis recherche la cellule étiquetée 'Code Ban*' dans les lignes 1-6.
+    - Feuille INFOS : lit directement la cellule E5.
+    - Autres feuilles : essaie D3, C3, E3, D5,
+      puis recherche l'étiquette 'Code Ban*' dans les 6 premières lignes.
     """
-    for cell_ref in ("D3", "C3", "E3"):
+    # Feuille INFOS → code en E5
+    if ws.title.strip().upper() == "INFOS":
+        val = ws["E5"].value
+        if val is not None and str(val).strip():
+            try:
+                return str(int(float(str(val).strip())))
+            except (ValueError, OverflowError):
+                s = str(val).strip()
+                if re.match(r"^\d{4,8}$", s):
+                    return s
+
+    # Fallback sur des cellules fixes
+    for cell_ref in ("D3", "C3", "E3", "D5"):
         val = ws[cell_ref].value
         if val is not None and str(val).strip():
             try:
@@ -2094,7 +2108,7 @@ def _dom_export_code_banque(ws):
                 if re.match(r"^\d{4,8}$", s):
                     return s
 
-    # Recherche dans les 6 premières lignes
+    # Recherche étiquetée dans les 6 premières lignes
     for row_idx in range(1, 7):
         row_vals = [ws.cell(row=row_idx, column=col).value for col in range(1, 12)]
         for i, cell_val in enumerate(row_vals):
@@ -2109,19 +2123,41 @@ def _dom_export_code_banque(ws):
     return None
 
 
+def _dom_export_annee(sheet_name: str):
+    """
+    Extrait l'année (4 chiffres) depuis le nom d'une feuille DOM EXPORT.
+    Exemples : '2022' → '2022', 'NOV.25' → '2025', 'Domiciliations 2023' → '2023'.
+    Retourne None si aucune année identifiable.
+    """
+    s = sheet_name.strip()
+    # Cas 1 : nom = exactement 4 chiffres
+    if re.fullmatch(r"\d{4}", s):
+        return s
+    # Cas 2 : contient une année 4 chiffres (ex. 'Domiciliations 2022')
+    m = re.search(r"\b(20\d{2})\b", s)
+    if m:
+        return m.group(1)
+    # Cas 3 : format MOIS.AA ex. 'NOV.25', 'DEC.25'
+    m = re.match(r"[A-Za-z\u00C0-\u00FF]+\.(\d{2})$", s)
+    if m:
+        return str(2000 + int(m.group(1)))
+    return None
+
+
 def _dom_export_find_header(ws):
     """
-    Cherche la ligne d'en-tête contenant 'Nom de l'exportateur'.
+    Détecte automatiquement la ligne d'en-tête en cherchant le mot 'exportateur'
+    (couvre 'Nom de l\'exportateur' et 'Nom Exportateur').
     Retourne (header_row_1based, col_nom_0based, col_facture_0based, col_rapatrmt_0based).
     """
     for row_idx in range(1, 20):
         max_col = min(ws.max_column, 30)
         row_vals = [ws.cell(row=row_idx, column=col).value for col in range(1, max_col + 1)]
         row_strs = [str(v).lower().strip() if v is not None else "" for v in row_vals]
-        if any("nom de l" in s and "exportateur" in s for s in row_strs):
+        if any("exportateur" in s for s in row_strs):
             col_nom, col_facture, col_rapatrmt = None, None, None
             for i, s in enumerate(row_strs):
-                if col_nom is None and "nom de l" in s and "exportateur" in s:
+                if col_nom is None and "exportateur" in s:
                     col_nom = i
                 if col_facture is None and "facture" in s and "montant" in s:
                     col_facture = i
@@ -2149,20 +2185,27 @@ def concatener_dom_export(fichiers) -> dict:
         nom = f.name
         try:
             wb = openpyxl.load_workbook(io.BytesIO(f.getvalue()), data_only=True)
-            # Code banque depuis la feuille active
-            code_banque_global = _dom_export_code_banque(wb.active)
+            # Code banque depuis la feuille INFOS (cellule E5)
+            infos_name = next((s for s in wb.sheetnames if s.strip().upper() == "INFOS"), None)
+            code_banque_global = (
+                _dom_export_code_banque(wb[infos_name]) if infos_name else None
+            )
 
             lignes_fichier = 0
             traite_ok = False
 
             for sheet_name in wb.sheetnames:
-                if not re.fullmatch(r"\d{4}", sheet_name.strip()):
+                # Ignorer la feuille INFOS
+                if sheet_name.strip().upper() == "INFOS":
                     continue
 
-                annee = sheet_name.strip()
+                annee = _dom_export_annee(sheet_name)
+                if annee is None:
+                    continue  # Feuille sans année identifiable
+
                 ws = wb[sheet_name]
 
-                # Code banque depuis cette feuille si non trouvé globalement
+                # Code banque depuis cette feuille si non trouvé dans INFOS
                 code_banque = code_banque_global or _dom_export_code_banque(ws) or "—"
 
                 header_row, col_nom, col_facture, col_rapatrmt = _dom_export_find_header(ws)
