@@ -2,27 +2,27 @@
   "users": [
     {
       "username": "admin",
-      "password_hash": "e564165cadd668f55e02364eec058d95b9d41beb7e0d14854cb421cb097d0c4e",
-      "salt": "f453f5d6dca3fee4f8137c170ddd39d7",
+      "password_hash": "1d6b49a769eb699ac9dfdd00ba72f027d17a0d55e284446e43229ebe7a3749df",
+      "salt": "5c92c8cf7bffe813f22658747d1e066c",
       "display_name": "Administrateur BEAC",
       "role": "admin",
-      "must_change_password": false
+      "must_change_password": true
     },
     {
       "username": "analyste",
-      "password_hash": "36ba84612a48e99dbeafe9726343e8af7e13909738583bb1b0a87137616fa56c",
-      "salt": "eca5406fca91716ab57ceda47d769e49",
+      "password_hash": "7945a32734c012e939accd8a43488d3adeb7e929ccd2b38308414b2ff819366a",
+      "salt": "cecb39fc5e525e56d15d8ecbf3fb876d",
       "display_name": "Analyste DFX",
       "role": "analyste_dfx",
-      "must_change_password": false
+      "must_change_password": true
     },
     {
       "username": "dom_export",
-      "password_hash": "b0569f78006788bc6229583ce630c7c1b3a859fa359e871fd6a2e91edd363123",
-      "salt": "eb532f1bc0236d9c50293d9e783f56d6",
+      "password_hash": "bdc40e8cf29c99bf00e266f60db7bf4a409d11a8a753970213663322014c56a5",
+      "salt": "ce803cfb64eca5cfc9cb3afe815811fd",
       "display_name": "Superviseur DOM Export",
       "role": "superviseur_dom",
-      "must_change_password": false
+      "must_change_password": true
     }
   ]
 }

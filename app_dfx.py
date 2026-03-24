@@ -612,17 +612,6 @@ def _page_login():
     if _login_error:
         st.error(_login_error)
 
-    # Identifiants par défaut — toujours visibles (nécessaire sur Streamlit Cloud
-    # où users.json est réinitialisé à chaque redémarrage du container)
-    with st.expander("ℹ️ Identifiants par défaut"):
-        st.markdown("""
-        | Identifiant | Mot de passe | Rôle |
-        |---|---|---|
-        | `admin` | `Admin@BEAC2026` | Administrateur |
-        | `analyste` | `DFX@2026` | Analyste DFX |
-        | `dom_export` | `Export@2026` | Superviseur DOM |
-        """)
-
     # Déclenchement du rerun hors de tout contexte layout (évite removeChild)
     if st.session_state.pop("_login_rerun", False):
         st.rerun()
