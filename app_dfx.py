@@ -543,6 +543,7 @@ def _page_login():
     </style>
     """, unsafe_allow_html=True)
 
+    _do_rerun = False
     col_l, col_c, col_r = st.columns([1, 1.2, 1])
     with col_c:
         # Carte login
@@ -593,7 +594,7 @@ def _page_login():
             st.session_state["display_name"]    = user["display_name"]
             st.session_state["role"]            = user["role"]
             st.session_state["must_change_pwd"] = user.get("must_change_password", False)
-            st.rerun()
+            _do_rerun = True
 
         # Première connexion : afficher les identifiants par défaut une seule fois
         if not os.path.exists(FICHIER_USERS):
@@ -605,6 +606,9 @@ def _page_login():
                 | `analyste` | `DFX@2026` | Analyste DFX |
                 | `dom_export` | `Export@2026` | Superviseur DOM |
                 """)
+    # Déclenchement du rerun HORS contexte column (évite l'erreur removeChild)
+    if _do_rerun:
+        st.rerun()
 
 
 def _page_changer_password():
@@ -683,7 +687,7 @@ def _sidebar_gestion_users():
                 })
                 _sauvegarder_users(data)
                 st.success(f"✅ Compte « {new_user} » créé avec succès.")
-                st.rerun()
+                st.session_state["_gestion_rerun"] = True
 
         st.markdown("---")
         st.markdown("#### Réinitialiser un mot de passe")
@@ -2774,7 +2778,11 @@ def main():
             for key in ["authenticated", "username", "display_name",
                         "role", "must_change_pwd"]:
                 st.session_state.pop(key, None)
-            st.rerun()
+            st.session_state["_do_logout"] = True
+
+    # Déclenchement du rerun HORS contexte sidebar (évite l'erreur removeChild)
+    if st.session_state.pop("_do_logout", False) or st.session_state.pop("_gestion_rerun", False):
+        st.rerun()
 
     # ── Bandeau de titre principal ─────────────────────────────────────────────
     if module == "Concaténation DFX":
