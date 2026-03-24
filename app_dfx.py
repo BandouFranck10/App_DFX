@@ -11,6 +11,7 @@ import io
 import json
 import hashlib
 import secrets
+import base64
 import pandas as pd
 from datetime import datetime
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -555,8 +556,16 @@ def _page_login():
     </style>
     """, unsafe_allow_html=True)
 
-    # Carte login
-    st.markdown("""
+    # Carte login — logo BEAC encodé en base64 pour compatibilité cloud
+    _logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo_beac.png")
+    if os.path.exists(_logo_path):
+        with open(_logo_path, "rb") as _f:
+            _logo_b64 = base64.b64encode(_f.read()).decode()
+        _logo_html = f'<img src="data:image/png;base64,{_logo_b64}" style="height:70px; margin-bottom:12px;">'
+    else:
+        _logo_html = '<div style="font-size: 58px; margin-bottom: 8px;">🏦</div>'
+
+    st.markdown(f"""
     <div style="
         background: linear-gradient(145deg, #002060 0%, #003087 60%, #004CB3 100%);
         border-radius: 18px;
@@ -566,7 +575,7 @@ def _page_login():
         text-align: center;
         margin-top: 40px;
     ">
-        <div style="font-size: 58px; margin-bottom: 8px;">🏦</div>
+        {_logo_html}
         <div style="font-size: 22px; font-weight: 900; color: #C8A951;
                     letter-spacing: 3px; text-transform: uppercase;">BEAC</div>
         <div style="font-size: 13px; color: #AAC0E0; margin: 4px 0 20px;
