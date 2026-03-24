@@ -535,79 +535,91 @@ def _trouver_utilisateur(data, username):
 
 
 def _page_login():
-    """Affiche la page de connexion centrée."""
-    # Masque la sidebar sur la page de login
+    """Affiche la page de connexion centrée (sans st.columns — évite removeChild)."""
+    # Masque la sidebar et centre via CSS uniquement — aucun st.columns()
+    # pour éviter le conflit React sidebar-étendue + layout-colonnes (removeChild)
     st.markdown("""
     <style>
     [data-testid="stSidebar"] { display: none !important; }
+    section.main > div.block-container {
+        max-width: 480px !important;
+        padding-top: 2.5rem !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-    _do_rerun = False
-    col_l, col_c, col_r = st.columns([1, 1.2, 1])
-    with col_c:
-        # Carte login
-        st.markdown("""
-        <div style="
-            background: linear-gradient(145deg, #002060 0%, #003087 60%, #004CB3 100%);
-            border-radius: 18px;
-            padding: 40px 36px 32px;
-            border: 1px solid rgba(200,169,81,0.4);
-            box-shadow: 0 8px 40px rgba(0,32,96,0.35);
-            text-align: center;
-            margin-top: 40px;
-        ">
-            <div style="font-size: 58px; margin-bottom: 8px;">🏦</div>
-            <div style="font-size: 22px; font-weight: 900; color: #C8A951;
-                        letter-spacing: 3px; text-transform: uppercase;">BEAC</div>
-            <div style="font-size: 13px; color: #AAC0E0; margin: 4px 0 20px;
-                        letter-spacing: 1px; text-transform: uppercase;">
-                Application de Supervision DFX
-            </div>
-            <div style="border-top: 1px solid rgba(200,169,81,0.3);
-                        padding-top: 16px; color: #C8D8F0; font-size: 13px;">
-                Veuillez vous identifier pour accéder aux modules
-            </div>
+    # Carte login
+    st.markdown("""
+    <div style="
+        background: linear-gradient(145deg, #002060 0%, #003087 60%, #004CB3 100%);
+        border-radius: 18px;
+        padding: 40px 36px 32px;
+        border: 1px solid rgba(200,169,81,0.4);
+        box-shadow: 0 8px 40px rgba(0,32,96,0.35);
+        text-align: center;
+        margin-top: 40px;
+    ">
+        <div style="font-size: 58px; margin-bottom: 8px;">🏦</div>
+        <div style="font-size: 22px; font-weight: 900; color: #C8A951;
+                    letter-spacing: 3px; text-transform: uppercase;">BEAC</div>
+        <div style="font-size: 13px; color: #AAC0E0; margin: 4px 0 20px;
+                    letter-spacing: 1px; text-transform: uppercase;">
+            Application de Supervision DFX
         </div>
-        """, unsafe_allow_html=True)
+        <div style="border-top: 1px solid rgba(200,169,81,0.3);
+                    padding-top: 16px; color: #C8D8F0; font-size: 13px;">
+            Veuillez vous identifier pour accéder aux modules
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
-        username = st.text_input("👤 Identifiant", placeholder="Votre identifiant")
-        password = st.text_input("🔒 Mot de passe", type="password", placeholder="Votre mot de passe")
+    username = st.text_input("👤 Identifiant", placeholder="Votre identifiant",
+                              key="login_username")
+    password = st.text_input("🔒 Mot de passe", type="password",
+                              placeholder="Votre mot de passe", key="login_password")
 
-        if st.button("🔓 Se connecter", use_container_width=True, type="primary"):
-            if not username or not password:
-                st.error("Veuillez renseigner l'identifiant et le mot de passe.")
-                return
+    _login_error = None
 
+    if st.button("🔓 Se connecter", use_container_width=True, type="primary",
+                 key="login_btn"):
+        if not username or not password:
+            _login_error = "Veuillez renseigner l'identifiant et le mot de passe."
+        else:
             data = _charger_users()
             user = _trouver_utilisateur(data, username.strip())
+            if user is None or not _verifier_password(password,
+                                                       user["password_hash"],
+                                                       user["salt"]):
+                _login_error = "❌ Identifiant ou mot de passe incorrect."
+            else:
+                # Connexion réussie
+                st.session_state["authenticated"]  = True
+                st.session_state["username"]        = user["username"]
+                st.session_state["display_name"]    = user["display_name"]
+                st.session_state["role"]            = user["role"]
+                st.session_state["must_change_pwd"] = user.get("must_change_password", False)
+                st.session_state["_login_rerun"]    = True
 
-            if user is None or not _verifier_password(password, user["password_hash"], user["salt"]):
-                st.error("❌ Identifiant ou mot de passe incorrect.")
-                return
+    if _login_error:
+        st.error(_login_error)
 
-            # Connexion réussie
-            st.session_state["authenticated"]  = True
-            st.session_state["username"]        = user["username"]
-            st.session_state["display_name"]    = user["display_name"]
-            st.session_state["role"]            = user["role"]
-            st.session_state["must_change_pwd"] = user.get("must_change_password", False)
-            _do_rerun = True
+    # Première connexion : afficher les identifiants par défaut une seule fois
+    if not os.path.exists(FICHIER_USERS):
+        with st.expander("ℹ️ Identifiants par défaut (première connexion)"):
+            st.markdown("""
+            | Identifiant | Mot de passe | Rôle |
+            |---|---|---|
+            | `admin` | `Admin@BEAC2026` | Administrateur |
+            | `analyste` | `DFX@2026` | Analyste DFX |
+            | `dom_export` | `Export@2026` | Superviseur DOM |
+            """)
 
-        # Première connexion : afficher les identifiants par défaut une seule fois
-        if not os.path.exists(FICHIER_USERS):
-            with st.expander("ℹ️ Identifiants par défaut (première connexion)"):
-                st.markdown("""
-                | Identifiant | Mot de passe | Rôle |
-                |---|---|---|
-                | `admin` | `Admin@BEAC2026` | Administrateur |
-                | `analyste` | `DFX@2026` | Analyste DFX |
-                | `dom_export` | `Export@2026` | Superviseur DOM |
-                """)
-    # Déclenchement du rerun HORS contexte column (évite l'erreur removeChild)
-    if _do_rerun:
+    # Déclenchement du rerun hors de tout contexte layout (évite removeChild)
+    if st.session_state.pop("_login_rerun", False):
         st.rerun()
 
 
