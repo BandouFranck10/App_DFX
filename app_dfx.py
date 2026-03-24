@@ -12,7 +12,6 @@ import json
 import hashlib
 import secrets
 import pandas as pd
-import duckdb
 from datetime import datetime
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
