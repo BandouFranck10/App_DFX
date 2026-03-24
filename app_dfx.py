@@ -1536,9 +1536,9 @@ def _lire_flat_consolide(src, label: str = "1200M",
         if not all([c_code, c_montant, c_devise]):
             st.warning(
                 f"{label} — colonnes non trouvées.\n"
-                f"  CODE BANQUE : {'\u2714' if c_code else '\u2718 absent'}  "
-                f"  MONTANT : {'\u2714' if c_montant else '\u2718 absent'}  "
-                f"  DEVISE : {'\u2714' if c_devise else '\u2718 absent'}\n"
+                f"  CODE BANQUE : {'✔' if c_code else '✘ absent'}  "
+                f"  MONTANT : {'✔' if c_montant else '✘ absent'}  "
+                f"  DEVISE : {'✔' if c_devise else '✘ absent'}\n"
                 f"  Colonnes dispo : {list(df.columns)[:12]}"
             )
             return None
