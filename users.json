@@ -6,7 +6,7 @@
       "salt": "f453f5d6dca3fee4f8137c170ddd39d7",
       "display_name": "Administrateur BEAC",
       "role": "admin",
-      "must_change_password": true
+      "must_change_password": false
     },
     {
       "username": "analyste",
@@ -14,7 +14,7 @@
       "salt": "eca5406fca91716ab57ceda47d769e49",
       "display_name": "Analyste DFX",
       "role": "analyste_dfx",
-      "must_change_password": true
+      "must_change_password": false
     },
     {
       "username": "dom_export",
@@ -22,7 +22,7 @@
       "salt": "eb532f1bc0236d9c50293d9e783f56d6",
       "display_name": "Superviseur DOM Export",
       "role": "superviseur_dom",
-      "must_change_password": true
+      "must_change_password": false
     }
   ]
 }

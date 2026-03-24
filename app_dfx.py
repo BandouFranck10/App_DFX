@@ -499,9 +499,14 @@ def _charger_users():
 
 
 def _sauvegarder_users(data):
-    """Sauvegarde le dict utilisateurs dans users.json."""
-    with open(FICHIER_USERS, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    """Sauvegarde le dict utilisateurs dans users.json (filesystem de la session)."""
+    try:
+        with open(FICHIER_USERS, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except OSError:
+        # Sur Streamlit Cloud en lecture seule : les changements sont
+        # appliqués en session uniquement (session_state) sans erreur fatale.
+        pass
 
 
 def _creer_users_defaut():
@@ -607,16 +612,16 @@ def _page_login():
     if _login_error:
         st.error(_login_error)
 
-    # Première connexion : afficher les identifiants par défaut une seule fois
-    if not os.path.exists(FICHIER_USERS):
-        with st.expander("ℹ️ Identifiants par défaut (première connexion)"):
-            st.markdown("""
-            | Identifiant | Mot de passe | Rôle |
-            |---|---|---|
-            | `admin` | `Admin@BEAC2026` | Administrateur |
-            | `analyste` | `DFX@2026` | Analyste DFX |
-            | `dom_export` | `Export@2026` | Superviseur DOM |
-            """)
+    # Identifiants par défaut — toujours visibles (nécessaire sur Streamlit Cloud
+    # où users.json est réinitialisé à chaque redémarrage du container)
+    with st.expander("ℹ️ Identifiants par défaut"):
+        st.markdown("""
+        | Identifiant | Mot de passe | Rôle |
+        |---|---|---|
+        | `admin` | `Admin@BEAC2026` | Administrateur |
+        | `analyste` | `DFX@2026` | Analyste DFX |
+        | `dom_export` | `Export@2026` | Superviseur DOM |
+        """)
 
     # Déclenchement du rerun hors de tout contexte layout (évite removeChild)
     if st.session_state.pop("_login_rerun", False):
