@@ -25,14 +25,6 @@
       "must_change_password": false
     },
     {
-      "username": "Landry",
-      "password_hash": "9cae54d30ead5956ba00185260f955978de8e9750e34a48b84063e5d7419fb4d",
-      "salt": "296e19e84f18eb4830dc8231797d8435",
-      "display_name": "BARKA LANDRY",
-      "role": "superviseur_dom",
-      "must_change_password": false
-    },
-    {
       "username": "Doina",
       "password_hash": "d1c0e0403c3b030dcd9d54ce0559cb7619e40725ad8b515ace1a7fb390d025cc",
       "salt": "1d9ca40d4dc2fc74e09bea7b13321307",
@@ -61,6 +53,14 @@
       "password_hash": "e2c5f519d8120268cb66dd4b823ec9e1d9f38fb11f8cc42a56da324e9314d90c",
       "salt": "0a14e810045cf15696fb9999ba427680",
       "display_name": "Administrator",
+      "role": "admin",
+      "must_change_password": false
+    },
+    {
+      "username": "Landry",
+      "password_hash": "83eed0e3d813f7322917ff4a1f832135a471a0ace90fb67c10b017e80bee2b79",
+      "salt": "05bb63e882b4f739224dc0dee064e31c",
+      "display_name": "BARKA Landry",
       "role": "admin",
       "must_change_password": false
     }
