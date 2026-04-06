@@ -6,7 +6,7 @@
       "salt": "742ab8c3be0032ed215b705ff5de886a",
       "display_name": "Administrateur BEAC",
       "role": "admin",
-      "must_change_password": true
+      "must_change_password": false
     },
     {
       "username": "analyste",
@@ -14,7 +14,7 @@
       "salt": "624174d5d65cd7ec8771afad45b07e6e",
       "display_name": "Analyste DFX",
       "role": "analyste_dfx",
-      "must_change_password": true
+      "must_change_password": false
     },
     {
       "username": "dom_export",
@@ -22,7 +22,47 @@
       "salt": "3aa8f7a75350e93d7fa9e90fc0ada583",
       "display_name": "Superviseur DOM Export",
       "role": "superviseur_dom",
-      "must_change_password": true
+      "must_change_password": false
+    },
+    {
+      "username": "Landry",
+      "password_hash": "9cae54d30ead5956ba00185260f955978de8e9750e34a48b84063e5d7419fb4d",
+      "salt": "296e19e84f18eb4830dc8231797d8435",
+      "display_name": "BARKA LANDRY",
+      "role": "superviseur_dom",
+      "must_change_password": false
+    },
+    {
+      "username": "Doina",
+      "password_hash": "d1c0e0403c3b030dcd9d54ce0559cb7619e40725ad8b515ace1a7fb390d025cc",
+      "salt": "1d9ca40d4dc2fc74e09bea7b13321307",
+      "display_name": "Doina BOUYONG",
+      "role": "analyste_dfx",
+      "must_change_password": false
+    },
+    {
+      "username": "Tavouka",
+      "password_hash": "188794f9c09ff6e5ac59b89004a652988bb866b6a7c798a1c87857e32bde7446",
+      "salt": "531622f651f07398ead6b1fdc78e704b",
+      "display_name": "Leny TAVOUKA",
+      "role": "admin",
+      "must_change_password": false
+    },
+    {
+      "username": "Estelle",
+      "password_hash": "403673ab72b30f7174f70550a3f80dcf494f5a740fb07a021a0580577b75cf86",
+      "salt": "3cd4b81c41a99dd2d901c8ad10297682",
+      "display_name": "Estelle BELINGA",
+      "role": "analyste_dfx",
+      "must_change_password": false
+    },
+    {
+      "username": "Bill",
+      "password_hash": "e2c5f519d8120268cb66dd4b823ec9e1d9f38fb11f8cc42a56da324e9314d90c",
+      "salt": "0a14e810045cf15696fb9999ba427680",
+      "display_name": "Administrator",
+      "role": "admin",
+      "must_change_password": false
     }
   ]
 }

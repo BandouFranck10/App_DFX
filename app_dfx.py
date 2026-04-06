@@ -526,7 +526,7 @@ def _creer_users_defaut():
             "salt":                 salt,
             "display_name":         display_name,
             "role":                 role,
-            "must_change_password": True,
+            "must_change_password": False,
         })
     _sauvegarder_users(data)
     return data
@@ -698,7 +698,7 @@ def _sidebar_gestion_users():
                     "salt":                 salt,
                     "display_name":         new_name.strip() or new_user.strip(),
                     "role":                 new_role,
-                    "must_change_password": True,
+                    "must_change_password": False,
                 })
                 _sauvegarder_users(data)
                 st.success(f"✅ Compte « {new_user} » créé avec succès.")
@@ -720,7 +720,7 @@ def _sidebar_gestion_users():
                     hashed, salt = _hash_password(reset_pwd)
                     target["password_hash"]       = hashed
                     target["salt"]                = salt
-                    target["must_change_password"] = True
+                    target["must_change_password"] = False
                     _sauvegarder_users(data)
                     st.success(f"✅ Mot de passe de « {sel_user} » réinitialisé.")
 
